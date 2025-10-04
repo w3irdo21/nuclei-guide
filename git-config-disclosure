@@ -1,0 +1,35 @@
+id: git-config-disclosure
+
+info:
+  name: Git Config Disclosure
+  author: 0xKayala
+  severity: medium
+  description: |
+    Checks if the /.git/config file is exposed on the target host.
+    The .git/config file may contain sensitive information such as repository
+    remote URLs and sometimes credentials.
+  reference:
+    - https://pentester.land/blog/source-code-disclosure-via-exposed-git-folder/
+  classification:
+    cwe-id: 16
+    cve-id: CVE-2023-29007
+  tags: git,exposure,config,source-code
+
+http:
+  - method: GET
+    path:
+      - "{{BaseURL}}/.git/config"
+
+    matchers:
+      - type: word
+        words:
+          - "[core]"
+        part: body
+
+    matchers-condition: and
+
+    extractors:
+      - type: regex
+        part: body
+        regex:
+          - "url\\s*=\\s*(.*)"
